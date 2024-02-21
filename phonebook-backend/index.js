@@ -8,7 +8,6 @@ app.use(express.json())
 
 // made a custom token called "data" that shows the body in morgan
 morgan.token("data", (req, res) => {
-  console.log(req);
   if (req.method === "POST") {
     return JSON.stringify(req.body)
   }
