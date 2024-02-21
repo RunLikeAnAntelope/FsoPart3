@@ -1,6 +1,21 @@
 const express = require("express")
+const morgan = require("morgan")
+
 const app = express()
+
+// stringify json for me and put it in the body
 app.use(express.json())
+
+// made a custom token called "data" that shows the body in morgan
+morgan.token("data", (req, res) => {
+  console.log(req);
+  if (req.method === "POST") {
+    return JSON.stringify(req.body)
+  }
+})
+
+// morgan middleware logger
+app.use(morgan(":method :url :status :res[content-length] - :response-time ms :data"))
 
 let persons = [
   {
@@ -57,9 +72,9 @@ app.delete("/api/persons/:id", (request, response) => {
 })
 
 // Create a person
-//add a phonebook entry
-app.post('/api/persons/', (request, response, next) => {
-  const person = request.body
+// add a phonebook entry
+app.post('/api/persons/', (request, response) => {
+  const person = { ...request.body }
   if (!person.name) {
     response.status(400).json({
       error: "name is missing"
@@ -77,9 +92,7 @@ app.post('/api/persons/', (request, response, next) => {
     persons = persons.concat(person)
     response.json(person)
   }
-
 })
-
 
 const PORT = 3001
 app.listen(PORT, () => {
