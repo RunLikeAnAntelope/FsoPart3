@@ -3,14 +3,12 @@ POST http://localhost:3001/api/persons/ HTTP/1.1
 content-type: application/json
 
 {
-    "name": "John Doe",
+   "name": "John Doe",
     "number": "555-555-5555"
 }
-###
-POST http://localhost:3001/api/persons/ HTTP/1.1
-content-type: application/json
 
-{
-    "name": "John Doe",
-    "number": "555-555-5555"
-}
+###
+GET http://localhost:3001/api/persons/1
+
+###
+DELETE http://localhost:3001/api/persons/9613006
