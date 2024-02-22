@@ -1,10 +1,17 @@
 const express = require("express")
 const morgan = require("morgan")
+const cors = require("cors")
 
 const app = express()
 
+//Use cors to bypass single origin policy
+app.use(cors())
+
 // stringify json for me and put it in the body
 app.use(express.json())
+
+// to make express show static content
+app.use(express.static('dist'))
 
 // made a custom token called "data" that shows the body in morgan
 morgan.token("data", (req, res) => {
@@ -93,7 +100,7 @@ app.post('/api/persons/', (request, response) => {
   }
 })
 
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 })
