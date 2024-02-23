@@ -1,10 +1,12 @@
 const express = require("express")
-const morgan = require("morgan")
-const cors = require("cors")
-
 const app = express()
 
-//Use cors to bypass single origin policy
+// add database stuff
+require("dotenv").config()
+const Person = require("./models/person")
+
+// Use cors to bypass single origin policy
+const cors = require("cors")
 app.use(cors())
 
 // stringify json for me and put it in the body
@@ -14,15 +16,15 @@ app.use(express.json())
 app.use(express.static('dist'))
 
 // made a custom token called "data" that shows the body in morgan
+const morgan = require("morgan")
 morgan.token("data", (req, res) => {
   if (req.method === "POST") {
     return JSON.stringify(req.body)
   }
 })
-
-// morgan middleware logger
 app.use(morgan(":method :url :status :res[content-length] - :response-time ms :data"))
 
+// rest of app
 let persons = [
   {
     "id": 1,
@@ -48,7 +50,9 @@ let persons = [
 
 // Get all the people
 app.get("/api/persons", (request, response) => {
-  response.json(persons)
+  Person.find({}).then(persons => {
+    response.json(persons)
+  })
 })
 
 // Get info
@@ -94,9 +98,13 @@ app.post('/api/persons/', (request, response) => {
       error: "name is already in phonebook"
     })
   } else {
-    person.id = Math.floor(Math.random() * 9999999)
-    persons = persons.concat(person)
-    response.json(person)
+    const dbPerson = new Person({
+      name: person.name,
+      number: person.number
+    })
+    dbPerson.save().then(savedPerson => {
+      response.json(savedPerson)
+    })
   }
 })
 
