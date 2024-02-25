@@ -71,7 +71,7 @@ app.get("/api/persons/:id", (request, response, next) => {
       if (person) {
         response.json(person)
       } else {
-        response.status(404).end() 
+        response.status(404).end()
       }
     })
     .catch(error => next(error))
@@ -92,7 +92,7 @@ app.delete("/api/persons/:id", (request, response, next) => {
 
 // Create a person
 // add a phonebook entry
-app.post('/api/persons/', (request, response) => {
+app.post('/api/persons/', (request, response, next) => {
   const person = { ...request.body }
   if (!person.name) {
     response.status(400).json({
@@ -114,6 +114,7 @@ app.post('/api/persons/', (request, response) => {
     dbPerson.save().then(savedPerson => {
       response.json(savedPerson)
     })
+      .catch(error => next(error))
   }
 })
 
