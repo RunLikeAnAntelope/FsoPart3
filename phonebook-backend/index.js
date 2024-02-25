@@ -49,18 +49,23 @@ let persons = [
 ]
 
 // Get all the people
-app.get("/api/persons", (request, response) => {
+app.get("/api/persons", (request, response, next) => {
   Person.find({}).then(persons => {
     response.json(persons)
   })
+    .catch(error => next(error))
 })
 
 // Get info
-app.get("/info", (request, response) => {
-  response.send(
-    `<p>Phonebook has info for ${persons.length} people.</p>
+app.get("/info", (request, response, next) => {
+  Person.countDocuments()
+    .then(count => {
+      response.send(
+        `<p>Phonebook has info for ${count} people.</p>
      <p>${Date()}</p>`
-  )
+      )
+    })
+    .catch(error => next(error))
 })
 
 // Get a specific person
@@ -102,10 +107,6 @@ app.post('/api/persons/', (request, response, next) => {
     response.status(400).json({
       error: "number is missing"
     })
-  } else if (persons.find(p => p.name === person.name)) {
-    response.status(400).json({
-      error: "name is already in phonebook"
-    })
   } else {
     const dbPerson = new Person({
       name: person.name,
@@ -116,6 +117,22 @@ app.post('/api/persons/', (request, response, next) => {
     })
       .catch(error => next(error))
   }
+})
+
+// Update a person
+app.put("/api/persons/:id", (request, response, next) => {
+  const body = request.body
+  const person = {
+    name: body.name,
+    number: body.number
+  }
+
+  // {new: true} is so the updated person gets returned
+  Person.findByIdAndUpdate(request.params.id, person, { new: true, runValidators: true, context: 'query'})
+  .then(updatedPerson => {
+    response.json(updatedPerson)
+  })
+  .catch(error => next(error))
 })
 
 // Unknown endpoint middleware
@@ -129,6 +146,8 @@ const errorHandler = (error, request, response, next) => {
   console.error(error.message)
   if (error.name === 'CastError') {
     return response.status(400).send({ error: "malformed id" })
+  }else if (error.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message })
   }
   next(error)
 }
