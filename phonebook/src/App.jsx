@@ -101,11 +101,9 @@ const App = () => {
             setSuccessMessage(undefined)
           }, 5000)
         })
-        .catch( () => {
-          setPersons(persons.filter(n => n.id !== person.id))
-          setErrorMessage(
-            `Information of ${person.name} has already been removed from the server`
-          )
+        .catch( error => {
+          console.log(error);
+          setErrorMessage(error.response.data.error)
           setTimeout(() => {
             setErrorMessage(undefined)
           }, 5000)
@@ -129,6 +127,12 @@ const App = () => {
           )
           setTimeout(() => {
             setSuccessMessage(undefined)
+          }, 5000)
+        })
+        .catch(error => {
+          setErrorMessage(error.response.data.error)
+          setTimeout(() => {
+            setErrorMessage(undefined)
           }, 5000)
         })
     }

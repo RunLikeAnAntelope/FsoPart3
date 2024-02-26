@@ -1,25 +1,26 @@
 const mongoose = require("mongoose")
 
+// eslint-disable-next-line no-undef
 const url = process.env.MONGODB_URI
 mongoose.set("strictQuery", false)
 
 mongoose.connect(url)
 
-const personSchema = new mongoose.Schema ({
+const personSchema = new mongoose.Schema({
   name: {
     type: String,
     minLength: 3,
-    required:true
+    required: true
   },
   number: {
-    type:String,
+    type: String,
     minLength: 8,
-    validate:{
-    validator: (v) => {
-      return /^\d{2,3}-\d+$/.test(v)
-    },
-    message: props => `${props.value} is not a valid phone number!`,
-    required: true
+    validate: {
+      validator: (v) => {
+        return /^\d{2,3}-\d+$/.test(v)
+      },
+      message: props => `${props.value} is not a valid phone number!`,
+      required: true
     }
 
   }
